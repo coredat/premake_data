@@ -18,7 +18,7 @@ make.create_solution(solution_data, project_defaults, ...)
   -- Create the solution for the project.
   print("Creating Solution")
 
-  solution("VortexApplication")
+  solution(solution_data.name)
   location("./")
 
   configurations(
