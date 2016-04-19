@@ -89,7 +89,33 @@ make.create_solution(solution_data, project_defaults, ...)
     local platform_link_options = find_table_with_platform(proj, "linkoptions")
     if platform_link_options then linkoptions(platform_link_options) end
 
-    links(proj.links)
+    -- Links and Link dependencies
+    if proj.links then links(proj.links) end
+
+    -- If we have project dependencies then we need
+    -- to check if that project specifies any links
+    -- as dependencies.
+    if proj.project_dependencies then
+
+      -- Loop through each of the dependencies
+      for i, dep in ipairs(proj.project_dependencies) do
+
+        -- Loop through the projects we have been given.
+        for j, other_proj in ipairs(arg) do
+
+          -- If a match then check for links
+          if dep == other_proj then
+            if other_proj.link_dependencies then links(other_proj.link_dependencies) end
+
+            local platform_dep_links = find_table_with_platform(other_proj, "link_dependencies")
+            if platform_dep_links then links(platform_dep_links) end
+          end
+        end
+
+      end
+
+    end
+
 
     buildoptions(proj.buildoptions)
     buildoptions(project_defaults.buildoptions)
