@@ -2,7 +2,6 @@
 make = {}
 
 
-
 function
 make.get_proj_root()
   local str = debug.getinfo(2, "S").source:sub(2)
@@ -11,7 +10,7 @@ end
 
 
 function
-make.create_solution(solution_data, ...)
+make.create_solution(solution_data, project_defaults, ...)
 
   -- Create the solution for the project.
   print("Creating Solution")
@@ -39,12 +38,61 @@ make.create_solution(solution_data, ...)
     location(proj.location)
     language(proj.language)
     kind(proj.kind)
-    files(proj.src_files)
-    includedirs(proj.include_directories)
-    libdirs(proj.lib_directories)
-    linkoptions(proj.linkoptions)
+
+    -- Thie function takes a string that represents a field
+    -- to search in the table. it will then append the premakes
+    -- platform name to the end, and search for that field.
+    function
+    find_table_with_platform(proj, string)
+      local result_table = {}
+      local call_str = "result_table = proj." .. string .. "_" .. os.get()
+
+      -- Need to watch this loadstring is depreated, but premake's version of lua is old.
+      local chunk = loadstring(call_str)
+      setfenv( chunk, { result_table = result_table, proj = proj } )
+      chunk()
+
+      -- This is new method, should premake's lua version change.
+      --load(call_str, nil, nil, my_env)()
+      -- local my_env = { table = table, proj = proj}
+
+      return getfenv(chunk).result_table
+    end
+
+    -- Src files
+    if proj.src_files then files(proj.src_files) end
+
+    local platform_src = find_table_with_platform(proj, "src_files")
+    if platform_src then files(platform_src) end
+
+    -- Excludes
+    if proj.src_excludes then excludes(proj.src_excludes) end
+
+    local platform_exclude = find_table_with_platform(proj, "src_files_exclude")
+    if platform_exclude then excludes(platform_exclude) end
+
+    -- Include dirs
+    if proj.inc_dirs then includedirs(proj.inc_dirs) end
+
+    local platform_inc_dirs = find_table_with_platform(proj, "inc_dirs")
+    if platform_inc_dirs then includedirs(platform_inc_dirs) end
+
+    -- Library directories
+    if proj.lib_dirs then libdirs(proj.lib_dirs) end
+
+    local platform_lib_dirs = find_table_with_platform(proj, "lib_dirs")
+    if platform_lib_dirs then libdirs(platform_lib_dirs) end
+
+    -- Link options
+    if proj.linkoptions then  linkoptions(proj.linkoptions) end
+
+    local platform_link_options = find_table_with_platform(proj, "linkoptions")
+    if platform_link_options then linkoptions(platform_link_options) end
+
     links(proj.links)
+
     buildoptions(proj.buildoptions)
+    buildoptions(project_defaults.buildoptions)
 
     -- Hardcoded
     configuration "Debug"
