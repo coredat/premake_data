@@ -1,7 +1,9 @@
+#!lua
 
-make = {}
+make = {} -- namespace
 
 
+-- Gets the root of the file.
 function
 make.get_proj_root()
   local str = debug.getinfo(2, "S").source:sub(2)
@@ -9,6 +11,7 @@ make.get_proj_root()
 end
 
 
+-- Generates a solution.
 function
 make.create_solution(solution_data, project_defaults, ...)
 
@@ -29,8 +32,6 @@ make.create_solution(solution_data, project_defaults, ...)
     -- Fill in the default information.
     if not proj.kind                  then proj.kind = "C++"               end
     if not proj.lib_directories       then proj.lib_directories = {""}     end
-    if not proj.linkoptions           then proj.linkoptions = {""}         end
-    if not proj.links                 then proj.links = {""}               end
     if not proj.include_directories   then proj.include_directories = {""} end
 
     -- Generate the project data.
@@ -104,11 +105,23 @@ make.create_solution(solution_data, project_defaults, ...)
         for j, other_proj in ipairs(arg) do
 
           -- If a match then check for links
-          if dep == other_proj then
+          if dep == other_proj.name then
+            -- Add this project as a dep
+            links(other_proj.name)
+
+            -- Add listed project deps
             if other_proj.link_dependencies then links(other_proj.link_dependencies) end
 
+            -- Find platform deps
             local platform_dep_links = find_table_with_platform(other_proj, "link_dependencies")
             if platform_dep_links then links(platform_dep_links) end
+
+            -- Add link option dependencies
+            if other_proj.linkoption_dependencies then linkoptions(other_proj.linkoption_dependencies) end
+
+            -- Platform
+            local platform_dep_link_options = find_table_with_platform(other_proj, "linkoption_dependencies")
+            if platform_dep_link_options then linkoptions(platform_dep_link_options) end
           end
         end
 
@@ -116,11 +129,15 @@ make.create_solution(solution_data, project_defaults, ...)
 
     end
 
-
     buildoptions(proj.buildoptions)
-    buildoptions(project_defaults.buildoptions)
 
-    -- Hardcoded
+    -- Global build options
+    if project_defaults.buildoptions then buildoptions(project_defaults.buildoptions) end
+
+    local plaform_project_default_buildopts = find_table_with_platform(project_defaults, "buildoptions")
+    if plaform_project_default_buildopts then buildoptions(plaform_project_default_buildopts) end
+
+    -- Hardcoded For now
     configuration "Debug"
     defines { "DEBUG" }
     flags { "Symbols", "Unicode"}
