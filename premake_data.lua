@@ -27,7 +27,7 @@ make.create_solution(solution_data, ...)
   -- Create the projects
   for i,proj in ipairs(arg) do
 
-    -- Fill in missing information
+    -- Fill in the default information.
     if not proj.kind                  then proj.kind = "C++"               end
     if not proj.lib_directories       then proj.lib_directories = {""}     end
     if not proj.linkoptions           then proj.linkoptions = {""}         end
@@ -35,8 +35,6 @@ make.create_solution(solution_data, ...)
     if not proj.include_directories   then proj.include_directories = {""} end
 
     -- Generate the project data.
-    print("Creating Project: " .. proj.name)
-
     project(proj.name)
     location(proj.location)
     language(proj.language)
