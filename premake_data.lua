@@ -27,7 +27,13 @@ make.create_solution(solution_data, project_defaults, ...)
   )
 
   -- Create the projects
-  for i,proj in ipairs(arg) do
+  -- for i, proj in ipairs(arg) do -- old way.
+
+  local arg = {...}
+
+  for i, proj in ipairs(arg) do
+
+    print("Building project: " .. proj.name)
 
     -- Fill in the default information.
     if not proj.kind                  then proj.kind = "C++"               end
