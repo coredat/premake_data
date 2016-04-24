@@ -125,6 +125,11 @@ make.create_solution(solution_data, project_defaults, ...)
             -- Add link option dependencies
             if other_proj.linkoption_dependencies then linkoptions(other_proj.linkoption_dependencies) end
 
+            -- We also need link dirs
+            if other_proj.lib_dirs then linkdirs(other_proj.lib_dirs) end
+            local platform_dep_lib_dirs = find_table_with_platform(other_proj, "lib_dirs")
+            if platform_dep_lib_dirs then libdirs(platform_dep_lib_dirs) end
+
             -- Platform
             local platform_dep_link_options = find_table_with_platform(other_proj, "linkoption_dependencies")
             if platform_dep_link_options then linkoptions(platform_dep_link_options) end
@@ -143,14 +148,26 @@ make.create_solution(solution_data, project_defaults, ...)
     local plaform_project_default_buildopts = find_table_with_platform(project_defaults, "buildoptions")
     if plaform_project_default_buildopts then buildoptions(plaform_project_default_buildopts) end
 
-    -- Hardcoded For now
     configuration "Debug"
     defines { "DEBUG" }
+
+    if project_defaults.defines then defines(project_defaults.defines); end
+
+    local platform_project_default_defines = find_table_with_platform(project_defaults, "defines")
+    if platform_project_default_defines then defines(platform_project_default_defines) end
+
     flags { "Symbols", "Unicode"}
+    flags(project_defaults.flags)
 
     configuration "Release"
     defines { "NDEBUG" }
+    if project_defaults.defines then defines(project_defaults.defines); end
+
+    local platform_project_default_defines = find_table_with_platform(project_defaults, "defines")
+    if platform_project_default_defines then defines(platform_project_default_defines) end
+
     flags { "Optimize", "Unicode" }
+    flags(project_defaults.flags)
   end
 
 end
