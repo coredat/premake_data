@@ -21,10 +21,10 @@ make.create_solution(solution_data, project_defaults, ...)
   solution(solution_data.name)
   location("./")
 
-  configurations(
+  configurations({
     "Debug",
     "Release"
-  )
+  })
 
   -- Create the projects
   -- for i, proj in ipairs(arg) do -- old way.
@@ -148,19 +148,20 @@ make.create_solution(solution_data, project_defaults, ...)
     local plaform_project_default_buildopts = find_table_with_platform(project_defaults, "buildoptions")
     if plaform_project_default_buildopts then buildoptions(plaform_project_default_buildopts) end
 
-    configuration "Debug"
-    defines { "DEBUG" }
+    configuration({"Debug"})
+    defines({"DEBUG"})
 
     if project_defaults.defines then defines(project_defaults.defines); end
 
     local platform_project_default_defines = find_table_with_platform(project_defaults, "defines")
     if platform_project_default_defines then defines(platform_project_default_defines) end
 
-    flags { "Symbols", "Unicode"}
+    flags({"Symbols", "Unicode"})
     flags(project_defaults.flags)
 
-    configuration "Release"
-    defines { "NDEBUG" }
+    configuration({"Release"})
+    defines({"NDEBUG"})
+
     if project_defaults.defines then defines(project_defaults.defines); end
 
     local platform_project_default_defines = find_table_with_platform(project_defaults, "defines")
