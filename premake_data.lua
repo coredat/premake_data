@@ -36,7 +36,7 @@ make.create_solution(solution_data, project_defaults, ...)
     print("Building project: " .. proj.name)
 
     -- Fill in the default information.
-    if not proj.kind                  then proj.kind = "C++"               end
+    if not proj.kind                  then proj.kind = "ConsoleApp"        end
     if not proj.lib_directories       then proj.lib_directories = {""}     end
     if not proj.include_directories   then proj.include_directories = {""} end
 
@@ -141,6 +141,11 @@ make.create_solution(solution_data, project_defaults, ...)
     end
 
     buildoptions(proj.buildoptions)
+
+    -- Temp fix to programatically copy assets
+    if proj.kind == "WindowedApp" then
+      postbuildcommands("ditto ${SRCROOT}/../../core/assets/ ${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/assets/");
+    end
 
     -- Global build options
     if project_defaults.buildoptions then buildoptions(project_defaults.buildoptions) end
