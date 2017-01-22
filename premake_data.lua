@@ -145,6 +145,7 @@ make.create_solution(solution_data, project_defaults, ...)
     -- Temp fix to programatically copy assets
     if proj.kind == "WindowedApp" then
       postbuildcommands("ditto ${SRCROOT}/../../core/assets/ ${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/assets/");
+      postbuildcommands("ditto ${SRCROOT}/../assets/ ${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/assets/");
     end
 
     -- Global build options
