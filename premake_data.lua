@@ -29,9 +29,9 @@ make.create_solution(solution_data, project_defaults, ...)
   -- Create the projects
   -- for i, proj in ipairs(arg) do -- old way.
 
-  local arg = {...}
+  local projects = {...}
 
-  for i, proj in ipairs(arg) do
+  for i, proj in ipairs(projects) do
 
     print("Building project: " .. proj.name)
 
@@ -65,6 +65,12 @@ make.create_solution(solution_data, project_defaults, ...)
 
       return getfenv(chunk).result_table
     end
+
+    -- Preprocessor
+    if proj.defines then defines(proj.defines); end
+
+    local platform_defines = find_table_with_platform(proj, "defines")
+    if platform_defines then defines(platform_defines) end
 
     -- Src files
     if proj.src_files then files(proj.src_files) end
@@ -108,7 +114,7 @@ make.create_solution(solution_data, project_defaults, ...)
       for i, dep in ipairs(proj.project_dependencies) do
 
         -- Loop through the projects we have been given.
-        for j, other_proj in ipairs(arg) do
+        for j, other_proj in ipairs(projects) do
 
           -- If a match then check for links
           if dep == other_proj.name then
@@ -125,6 +131,11 @@ make.create_solution(solution_data, project_defaults, ...)
             -- Add link option dependencies
             if other_proj.linkoption_dependencies then linkoptions(other_proj.linkoption_dependencies) end
 
+            -- Include dirs
+            if other_proj.inc_dirs then includedirs(other_proj.inc_dirs) end
+            local platform_inc_dirs = find_table_with_platform(other_proj, "inc_dirs")
+            if platform_inc_dirs then includedirs(platform_inc_dirs) end
+
             -- We also need link dirs
             if other_proj.lib_dirs then linkdirs(other_proj.lib_dirs) end
             local platform_dep_lib_dirs = find_table_with_platform(other_proj, "lib_dirs")
@@ -133,6 +144,11 @@ make.create_solution(solution_data, project_defaults, ...)
             -- Platform
             local platform_dep_link_options = find_table_with_platform(other_proj, "linkoption_dependencies")
             if platform_dep_link_options then linkoptions(platform_dep_link_options) end
+
+            -- Preprocessor
+            if other_proj.defines then defines(other_proj.defines) end
+            local platform_defines = find_table_with_platform(other_proj, "defines")
+            if platform_defines then defines(platform_defines) end
           end
         end
 
@@ -143,9 +159,14 @@ make.create_solution(solution_data, project_defaults, ...)
     buildoptions(proj.buildoptions)
 
     -- Temp fix to programatically copy assets
-    if proj.kind == "WindowedApp" then
-      postbuildcommands("ditto ${SRCROOT}/../../core/assets/ ${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/assets/");
-      postbuildcommands("ditto ${SRCROOT}/../assets/ ${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/assets/");
+    if proj.kind == "WindowedApp" and projects then
+
+      for j, asset_proj in ipairs(projects) do
+        if asset_proj.asset_dir then
+          postbuildcommands("ditto ${SRCROOT}/".. asset_proj.asset_dir .." ${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/assets/");
+        end
+        -- postbuildcommands("ditto ${SRCROOT}/../assets/ ${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/assets/");
+      end
     end
 
     -- Global build options
