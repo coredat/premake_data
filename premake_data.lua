@@ -13,7 +13,7 @@ end
 
 -- Generates a solution.
 function
-make.create_solution(solution_data, project_defaults, ...)
+make.create_solution(solution_data, project_defaults, projects)
 
   -- Create the solution for the project.
   print("Creating Solution")
@@ -28,8 +28,6 @@ make.create_solution(solution_data, project_defaults, ...)
 
   -- Create the projects
   -- for i, proj in ipairs(arg) do -- old way.
-
-  local projects = {...}
 
   for i, proj in ipairs(projects) do
 
