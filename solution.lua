@@ -46,25 +46,15 @@ project_defaults = {
 }
 
 
--- dofile("../foo/foo.lua")
--- dofile("../bar/bar.lua")
-
-
 projects = {}
 matches = os.matchdirs("../*")
 
-print("DIRS:")
-
 for i, proj in ipairs(matches) do
   if(os.isfile(proj .. "/project.lua")) then
-    print("REQUIRE: " .. proj .. "/project.lua")
+    print("Found: " .. proj .. "/project.lua")
     dofile(proj .. "/project.lua")
   end
 end
-
-print("Projs")
-print(#projects)
-
 
 -- Generates the premake code calls.
 make.create_solution(
