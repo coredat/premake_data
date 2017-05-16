@@ -116,18 +116,33 @@ make.create_solution(solution_data, project_defaults, projects)
 
           -- If a match then check for links
           if dep == other_proj.name then
-            -- Add this project as a dep
-            links(other_proj.name)
 
-            -- Add listed project deps
-            if other_proj.link_dependencies then links(other_proj.link_dependencies) end
+            -- Projects can be marked no link
+            -- But still want to bring in header files etc.
+            
+            link = true;
+            if other_proj.no_link == true then link = false end
 
-            -- Find platform deps
-            local platform_dep_links = find_table_with_platform(other_proj, "link_dependencies")
-            if platform_dep_links then links(platform_dep_links) end
+            if link then
 
-            -- Add link option dependencies
-            if other_proj.linkoption_dependencies then linkoptions(other_proj.linkoption_dependencies) end
+              -- Add this project as a dep
+              links(other_proj.name)
+
+              -- Add listed project deps
+              if other_proj.link_dependencies then links(other_proj.link_dependencies) end
+
+              -- Find platform deps
+              local platform_dep_links = find_table_with_platform(other_proj, "link_dependencies")
+              if platform_dep_links then links(platform_dep_links) end
+
+              -- Add link option dependencies
+              if other_proj.linkoption_dependencies then linkoptions(other_proj.linkoption_dependencies) end
+
+              -- Platform
+              local platform_dep_link_options = find_table_with_platform(other_proj, "linkoption_dependencies")
+              if platform_dep_link_options then linkoptions(platform_dep_link_options) end
+
+            end
 
             -- Include dirs
             if other_proj.inc_dirs then includedirs(other_proj.inc_dirs) end
@@ -139,14 +154,11 @@ make.create_solution(solution_data, project_defaults, projects)
             local platform_dep_lib_dirs = find_table_with_platform(other_proj, "lib_dirs")
             if platform_dep_lib_dirs then libdirs(platform_dep_lib_dirs) end
 
-            -- Platform
-            local platform_dep_link_options = find_table_with_platform(other_proj, "linkoption_dependencies")
-            if platform_dep_link_options then linkoptions(platform_dep_link_options) end
-
             -- Preprocessor
             if other_proj.defines then defines(other_proj.defines) end
             local platform_defines = find_table_with_platform(other_proj, "defines")
             if platform_defines then defines(platform_defines) end
+
           end
         end
 
