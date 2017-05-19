@@ -1,4 +1,5 @@
 # premake_data
-Premake helper
 
-MIT
+Helper to make Republic of Almost Solution
+
+this file is public domain 2017

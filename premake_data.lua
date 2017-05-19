@@ -3,12 +3,52 @@
 make = {} -- namespace
 
 
+----------------------------------------------------------------- [ HELPERS ] --
+
+
 -- Gets the root of the file.
 function
 make.get_proj_root()
   local str = debug.getinfo(2, "S").source:sub(2)
   return str:match("(.*/)")
 end
+
+
+-- Adds source file patterns
+function
+make.add_src(dir)
+  return {
+    dir .. "**.cpp",
+    dir .. "**.cc",
+    dir .. "**.mm",
+    dir .. "**.c",
+    dir .. "**.m",
+  }
+end
+
+
+-- Adds header file patterns
+function
+make.add_headers(dir)
+  return {
+    dir .. "**.hpp",
+    dir .. "**.hh",
+    dir .. "**.h",
+  }
+end
+
+
+-- Adds doc file patterns
+function
+make.add_doc(dir)
+  return {
+    dir .. "**.txt",
+    dir .. "**.md",
+  }
+end
+
+
+------------------------------------------------------ [ SOLUTION GENERATOR ] --
 
 
 -- Generates a solution.
@@ -117,6 +157,8 @@ make.create_solution(solution_data, project_defaults, projects)
           -- If a match then check for links
           if dep == other_proj.name then
 
+            print("  -- Adding Dep: " .. dep);
+
             -- Projects can be marked no link
             -- But still want to bring in header files etc.
             
@@ -150,9 +192,11 @@ make.create_solution(solution_data, project_defaults, projects)
             if platform_inc_dirs then includedirs(platform_inc_dirs) end
 
             -- We also need link dirs
-            if other_proj.lib_dirs then linkdirs(other_proj.lib_dirs) end
-            local platform_dep_lib_dirs = find_table_with_platform(other_proj, "lib_dirs")
-            if platform_dep_lib_dirs then libdirs(platform_dep_lib_dirs) end
+            if proj.kind ~= "StaticLib" then
+              if other_proj.lib_dirs then linkdirs(other_proj.lib_dirs) end
+              local platform_dep_lib_dirs = find_table_with_platform(other_proj, "lib_dirs")
+              if platform_dep_lib_dirs then libdirs(platform_dep_lib_dirs) end
+            end
 
             -- Preprocessor
             if other_proj.defines then defines(other_proj.defines) end
