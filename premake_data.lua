@@ -161,7 +161,7 @@ make.create_solution(solution_data, project_defaults, projects)
 
             -- Projects can be marked no link
             -- But still want to bring in header files etc.
-            
+
             link = true;
             if other_proj.no_link == true then link = false end
 
@@ -211,6 +211,7 @@ make.create_solution(solution_data, project_defaults, projects)
     end
 
     buildoptions(proj.buildoptions)
+    buildoptions('-x c++')
 
     -- Temp fix to programatically copy assets
     if proj.kind == "WindowedApp" and projects then
