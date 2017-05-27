@@ -84,6 +84,8 @@ make.create_solution(solution_data, project_defaults, projects)
     language(proj.language)
     kind(proj.kind)
 
+    if proj.uuid then uuid(proj.uuid) end
+
     -- Thie function takes a string that represents a field
     -- to search in the table. it will then append the premakes
     -- platform name to the end, and search for that field.
@@ -233,6 +235,9 @@ make.create_solution(solution_data, project_defaults, projects)
     configuration({"Debug"})
     defines({"DEBUG"})
 
+    targetdir("../output/debug/")
+    objdir("../objects/")
+
     if project_defaults.defines then defines(project_defaults.defines); end
 
     local platform_project_default_defines = find_table_with_platform(project_defaults, "defines")
@@ -243,6 +248,11 @@ make.create_solution(solution_data, project_defaults, projects)
 
     configuration({"Release"})
     defines({"NDEBUG"})
+
+    targetdir("../output/release/")
+    objdir("../objects/")
+
+    if proj.targetdir then targetdir(proj.targetdir) end
 
     if project_defaults.defines then defines(project_defaults.defines); end
 
