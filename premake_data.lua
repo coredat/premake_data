@@ -247,7 +247,7 @@ make.create_solution(solution_data, project_defaults, projects)
     flags(project_defaults.flags)
 
     configuration({"Release"})
-    defines({"NDEBUG"})
+    defines({"NDEBUG", "NIMGUI"})
 
     targetdir("../output/release/")
     objdir("../objects/")
