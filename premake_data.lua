@@ -232,10 +232,13 @@ make.create_solution(solution_data, project_defaults, projects)
     local plaform_project_default_buildopts = find_table_with_platform(project_defaults, "buildoptions")
     if plaform_project_default_buildopts then buildoptions(plaform_project_default_buildopts) end
 
+    local output = "../output"
+    if solution_data.output then output = solution_data.output end
+
     configuration({"Debug"})
     defines({"DEBUG"})
 
-    targetdir("../output/debug/")
+    targetdir(output .. "/debug/")
     objdir("../objects/")
 
     if project_defaults.defines then defines(project_defaults.defines); end
@@ -249,7 +252,7 @@ make.create_solution(solution_data, project_defaults, projects)
     configuration({"Release"})
     defines({"NDEBUG", "NIMGUI"})
 
-    targetdir("../output/release/")
+    targetdir(output .. "/release/")
     objdir("../objects/")
 
     if proj.targetdir then targetdir(proj.targetdir) end
